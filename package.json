@@ -1,0 +1,8 @@
+{
+  "name": "amir-biazar",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon --exec babel-node ./bin/www"
+  }
+}

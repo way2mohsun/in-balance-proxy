@@ -1,0 +1,39 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+*.DS_Store
+
+.atom/
+.buildlog/
+.history
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+
+.idea/
+.packages/
+.pub-cache/
+.pub/
+.build/
+sessions/
+.idea/
+.history/
+.vscode/
+chart/
+log/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+node_modules

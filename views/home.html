@@ -1,0 +1,217 @@
+<html>
+
+<head>
+
+    <script src="/jquery/jquery.js" type="text/javascript"></script>
+    <script src="/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="bootstrap-dialog/bootstrap-dialog.min.js" type="text/javascript"></script>
+
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css" />
+    <link href="bootstrap-dialog/bootstrap-dialog.min.css" rel="stylesheet" type="text/css" />
+    <link href="jquery/selection.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+</body>
+
+<div class="container">
+    <div id="brand-admin" class="container-fluid"></div>
+    <br>
+    <br>
+    <div class="container-fluid">
+        <p style="text-align:right">
+            <a href="../logout" id="create-new-user">
+                <span class="glyphicon glyphicon-log-out"></span>
+                Logout
+            </a>
+        </p>
+        <a href="#" id="create-task">
+            <span class="glyphicon glyphicon-plus"></span>
+            Create
+        </a>
+        <br>
+        <br>
+        <table class="table table-hover table-responsive" id="tasks">
+            <thead>
+                <tr>
+                    <th>Task-Id</th>
+                    <th>Task</th>
+                    <th>Description</th>
+                    <th>Update</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div id="brand-footer" class="container-fluid"> </div>
+</div>
+
+<script type="text/javascript">
+    var status = '';
+    var task;
+    (function () {
+        $.ajax({
+            async: false,
+            type: 'POST',
+            url: "repo/status",
+            timeout: 10000,
+            success: function (data) {
+                for (i in data) {
+                    status += '<option value="' + data[i].id + '">' + data[i].desc + '</option>';
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(errorThrown);
+            }
+        });
+        tasks();
+    })();
+
+    function tasks() {
+        $("#tasks tbody").remove();
+        $.ajax({
+            async: false,
+            type: 'POST',
+            url: "repo/tasks",
+            timeout: 10000,
+            success: function (data) {
+                task = data;
+                for (var i in data) {
+                    $("#tasks").append('<tbody><tr>\
+                        <td>' + data[i].id + '</td>\
+                        <td>' + data[i].task + '</td>\
+                        <td>' + data[i].desc + '</td>\
+                        <td><button id="edit-' + data[i].id + '" \
+                        type="button" data-toggle="modal" data-target="#edit" data-uid="1" class="update btn btn-warning btn-sm">\
+                        <span class="glyphicon glyphicon-pencil">\
+                        </span></button></td><td>\
+                        <button id="delete-' + data[i].id + '" \
+                        type="button" data-toggle="modal" data-target="#delete" data-uid="1" class="delete btn btn-danger btn-sm">\
+                        <span class="glyphicon glyphicon-trash">\
+                        </span></button></td></tr></tbody>');
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(errorThrown);
+            }
+        });
+    }
+
+
+    $(document).on('click', '[id^="delete-"]', function (e) {
+        var dlt = $(this)[0].attributes[0].textContent;
+        dlt = dlt.slice(7, dlt.length);
+        BootstrapDialog.show({
+            title: 'Confirm',
+            message: "Are you sure to delete <b>[" + dlt + "]</b> username",
+            buttons: [{
+                label: 'Delete',
+                hotkey: 13, // Enter.
+                action: function (dialog) {
+                    dialog.close();
+                    $.ajax({
+                        async: false,
+                        type: 'POST',
+                        url: "repo/task-delete",
+                        timeout: 10000,
+                        data: {
+                            id: dlt
+                        },
+                        success: function (data) {
+                            tasks();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log(errorThrown);
+                        }
+                    });
+                }
+            }]
+        });
+    });
+
+    $(document).on('click', '[id^="edit-"]', function (e) {
+        var edt = $(this)[0].attributes[0].textContent;
+        edt = edt.slice(5, edt.length);
+        var selected;
+        for (i in task ) {
+            if (task[i].id == edt) {
+                selected = task[i].task;
+                break;
+            }
+        }
+        var input = '<label>Description</label>\
+                    <input type="text" class="form-control" id="status-desc"/>\
+                    <br>\
+                    <label>Status</label>\
+                    <select id="status"> ' + status + '</select>';
+
+        BootstrapDialog.show({
+            title: 'Set Status',
+            message: $(input),
+            buttons: [{
+                label: 'Set Status',
+                hotkey: 13, // Enter.
+                action: function (dialog) {
+                    dialog.close();
+                    $.ajax({
+                        async: false,
+                        type: 'POST',
+                        url: "repo/task-status",
+                        timeout: 10000,
+                        data: {
+                            task: selected,
+                            desc: $("#status-desc").val(),
+                            status : document.getElementById("status").options[document.getElementById("status").selectedIndex].text
+                        },
+                        success: function (data) {
+                            tasks();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log(errorThrown);
+                        }
+                    });
+                }
+            }]
+        });
+    });
+
+    $(document).on('click', '[id="create-task"]', function (e) {
+        var input = '<label>Task</label>\
+                    <input type="text" class="form-control" id="new-task"/>\
+                    <label>Description</label>\
+                    <input type="text" class="form-control" id="new-desc"/>'
+        BootstrapDialog.show({
+            title: 'New Task',
+            message: $(input),
+            buttons: [{
+                label: 'Create',
+                hotkey: 13, // Enter.
+                action: function (dialog) {
+                    dialog.close();
+                    $.ajax({
+                        async: false,
+                        type: 'POST',
+                        url: "repo/task-create",
+                        timeout: 10000,
+                        data: {
+                            task: $("#new-task").val(),
+                            desc: $("#new-desc").val()
+                        },
+                        success: function (data) {
+                            tasks();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log(errorThrown);
+                        }
+                    });
+                }
+            }]
+        });
+    });
+</script>
+
+</html>

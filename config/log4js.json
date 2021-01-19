@@ -1,0 +1,33 @@
+{
+  "appenders": {
+    "in_request": {
+      "type": "file",
+      "filename": "log/in-req.log",
+      "maxLogSize": 10485760,
+      "numBackups": 3
+    },
+    "errorFile": {
+      "type": "file",
+      "filename": "log/errors.log"
+    },
+    "errors": {
+      "type": "logLevelFilter",
+      "level": "ERROR",
+      "appender": "errorFile"
+    }
+  },
+  "categories": {
+    "default": {
+      "appenders": [
+        "errors"
+      ],
+      "level": "DEBUG"
+    },
+    "in_request": {
+      "appenders": [
+        "in_request"
+      ],
+      "level": "INFO"
+    }
+  }
+}
