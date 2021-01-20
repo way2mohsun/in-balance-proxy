@@ -44,12 +44,12 @@ app.use("/jquery", express.static(__dirname + '/public/jquery-2.1.4'));
 app.use("/bootstrap", express.static(__dirname + '/public/bootstrap-3.3.5'));
 app.use("/font-awesome", express.static(__dirname + '/public/font-awesome'));
 app.use("/bootsnipp", express.static(__dirname + '/public/bootsnipp'));
-
 app.use('/', require('./routes/login'));
 app.use('/home', loginRequire, require('./routes/home'));
 app.use('/repo', loginRequire, require('./routes/repo'));
 //app.use('/report', require('./routes/report'));
 app.use('/balance', require('./routes/balance'));
+app.use('/3d-party', require('./routes/third-party'));
 
 function loginRequire(req, res, next) {
   if (req.session.user_id) {
