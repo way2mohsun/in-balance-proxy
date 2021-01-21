@@ -14,8 +14,14 @@ router.all('/', function (req, res, next) {
     });
     req.on('end', async function () {
         try {
-            const { Request: { msisdn: a_number }, Request: { bPartyDetails: { bPartyNumber: b_number } } } = await parse_body(data);
-            let results = await send_3d_party(await db_result(a_number), await db_result(b_number));
+            const
+                {
+                    Request: { msisdn: a_number },
+                    Request: { bPartyDetails: { bPartyNumber: b_number } }
+                } = await parse_body(data);
+            let results = await send_3d_party(
+                await db_result(a_number),
+                await db_result(b_number));
             log.info(results.req, results.res);
             return res.status(200).send('Done');
         } catch (error) {
